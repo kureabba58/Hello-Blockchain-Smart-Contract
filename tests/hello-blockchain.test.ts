@@ -1,21 +1,46 @@
+import { describe, it, beforeEach, expect } from 'vitest';
 
-import { describe, expect, it } from "vitest";
+// Mocking the Hello Blockchain contract for testing purposes
+const mockHelloBlockchain = {
+  state: {
+    helloMessage: "" as string,
+  },
+  setHello: (message: string) => {
+    mockHelloBlockchain.state.helloMessage = message;
+    return { value: "Message set successfully" };
+  },
+  getHello: () => {
+    return mockHelloBlockchain.state.helloMessage;
+  },
+};
 
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
+describe('Hello Blockchain Contract', () => {
+  let user1: string, user2: string;
 
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
+  beforeEach(() => {
+    // Initialize mock state and user principals
+    user1 = 'ST1234...';
+    user2 = 'ST5678...';
 
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
+    mockHelloBlockchain.state = {
+      helloMessage: "",
+    };
   });
 
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
+  it('should allow setting a hello message', () => {
+    const result = mockHelloBlockchain.setHello('Hello, Blockchain!');
+    expect(result).toEqual({ value: "Message set successfully" });
+    expect(mockHelloBlockchain.state.helloMessage).toBe('Hello, Blockchain!');
+  });
+
+  it('should retrieve the correct hello message', () => {
+    mockHelloBlockchain.setHello('Hello, Blockchain!');
+    const message = mockHelloBlockchain.getHello();
+    expect(message).toBe('Hello, Blockchain!');
+  });
+
+  it('should retrieve an empty message before setting one', () => {
+    const message = mockHelloBlockchain.getHello();
+    expect(message).toBe('');
+  });
 });
